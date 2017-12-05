@@ -1,4 +1,4 @@
-package remote;
+package interfaces;
 
 public interface GestionnaireRMI extends java.rmi.Remote {
 

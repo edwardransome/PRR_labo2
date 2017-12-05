@@ -1,5 +1,6 @@
 import remote.GestionnaireRMIImpl;
 
+import java.rmi.Naming;
 import java.rmi.RMISecurityManager;
 
 public class Main {
@@ -11,11 +12,12 @@ public class Main {
         int id = Integer.parseInt(args[0]);
         int numberOfSites = Integer.parseInt(args[1]);
 
-        GestionnaireRMIImpl gest = new GestionnaireRMIImpl(id, numberOfSites);
-        System.setSecurityManager(new RMISecurityManager());
+        GestionnaireRMIImpl gest;
         try{
             String serverName = "Gestionnaire"+id;
-
+            gest = new GestionnaireRMIImpl(id, numberOfSites);
+            Naming.rebind(serverName, gest);
+            System.out.println("Gestionnaire " + serverName + " est pret!");
         } catch(Exception e){
             System.out.println("Exception a l'enregistrement: " + e);
         }
