@@ -43,7 +43,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      * Permet au Travailleur de modifier la variable globale. Pourra être effectué uniquement
      * lorsque la section critique est accordée, c'est-à-dire la requête de ce site est la
      * plus ancienne de la queue.
-     * @param i la variable globale a setter
+     * @param i la variable globale que l'on souhaite setter dans la section critique
      */
     public void set(int i) {
         futureValue = i;
