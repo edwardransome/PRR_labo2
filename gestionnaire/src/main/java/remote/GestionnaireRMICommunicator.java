@@ -3,12 +3,14 @@
  */
 package remote;
 
+import java.rmi.RemoteException;
+
 public interface GestionnaireRMICommunicator extends java.rmi.Remote {
 
-    public void receiveRequest(int id, long time);
+    public void receiveRequest(int id, long time) throws RemoteException;
 
-    public void receiveRelease(int id, long time, int value);
+    public void receiveRelease(int id, long time, int value) throws RemoteException;
 
-    public void receiveResponse(int id, long time);
+    public void receiveResponse(int id, long time) throws RemoteException;
 
 }

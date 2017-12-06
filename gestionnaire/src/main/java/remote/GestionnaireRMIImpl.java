@@ -66,7 +66,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      * @param time estampille
      */
     public void receiveRequest(int id, long time){
-
+        sites.add(new Pair<Integer, Long>(id, time));
     }
 
     /**
@@ -95,11 +95,8 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
             if(sites.peek().getKey() == id){
                 //on peut entrer en section critique
                 enterCriticalSection();
-            }else{
-                //on ne peut pas
             }
         }
-
     }
 
 
@@ -107,6 +104,16 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      * Envoit une requete a tous les autres sites et ajoute sa propre requete a la queue
      */
     private void requestCriticalSection(){
+        //TODO ajouter notre requete avec timestamp
+        for(int i = 0; i < numberOfSites; ++i){
+            try {
+                GestionnaireRMICommunicator gest =
+                        (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + i);
+                gest.receiveRelease(id, clock, globalVariable);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
 
     }
 
@@ -115,7 +122,13 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      * @param id
      */
     private void sendResponse(int id){
-
+        try {
+            GestionnaireRMICommunicator gest =
+                    (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + id);
+            gest.receiveResponse(id, clock);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
