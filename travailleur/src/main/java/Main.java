@@ -31,13 +31,15 @@ public class Main {
                             System.out.println("La valeur actuelle de la variable globale est de " + value);
                             break;
 
-
                         case SET:
+                            System.out.println("Tentative d'obtenir la section critique...");
+                            gest.waitForCriticalSection();
+                            System.out.println("Section critique obtenue!");
                             System.out.println("Entrez une nouvelle valeur pour la variable globale: ");
                             int newValue = scanner.nextInt();
                             gest.set(newValue);
+                            gest.releaseCriticalSection();
                             break;
-
 
                         case QUIT:
                             done = true;
