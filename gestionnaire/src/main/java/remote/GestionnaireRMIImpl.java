@@ -4,6 +4,7 @@ import enums.TypeMessage;
 import javafx.util.Pair;
 
 import javax.sql.rowset.Predicate;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -23,7 +24,6 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     private final int id;
     private final int numberOfSites;
     private long clock;
-    private int numberOfResponses;
 
     private ArrayList<Pair<TypeMessage, Long>> sites;
 
@@ -32,7 +32,6 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
         this.id = id;
         this.numberOfSites = numberOfSites;
         this.clock = 0;
-        this.numberOfResponses = 0;
         sites = new ArrayList<Pair<TypeMessage, Long>>(numberOfSites);
     }
 
@@ -63,7 +62,21 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      */
     public void receiveRequest(int id, long time){
         clock = Math.max(clock, time) + 1;
+
         sites.set(id, new Pair<>(TypeMessage.REQUETE, clock));
+        try {
+            GestionnaireRMICommunicator gest =
+                    (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + id);
+            gest.receiveResponse(id, clock);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+        if(sites.get(this.id).getKey() == TypeMessage.REQUETE && permission(this.id)){
+            enterCriticalSection();
+        }
+
     }
 
     /**
@@ -104,12 +117,13 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     public void receiveResponse(int id, long time){
         clock = Math.max(clock, time) + 1;
 
-        numberOfResponses++;
-        if(numberOfResponses == numberOfSites - 1){
-            if(sites.peek().getKey() == id){
-                //on peut entrer en section critique
-                enterCriticalSection();
-            }
+        Pair<TypeMessage, Long> dernierMessage = sites.get(id);
+        if(dernierMessage.getKey() != TypeMessage.REQUETE){
+            sites.set(id, new Pair<>(TypeMessage.QUITTANCE, time));
+        }
+
+        if(sites.get(this.id).getKey() == TypeMessage.REQUETE && permission(this.id)){
+            enterCriticalSection();
         }
     }
 
@@ -118,12 +132,12 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      * Envoit une requete a tous les autres sites et ajoute sa propre requete a la queue
      */
     private void requestCriticalSection(){
-        //TODO ajouter notre requete avec timestamp
+        clock++;
         for(int i = 0; i < numberOfSites; ++i){
             try {
                 GestionnaireRMICommunicator gest =
                         (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + i);
-                gest.receiveRelease(id, clock, globalVariable);
+                gest.receiveRequest(id, clock);
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -167,7 +181,6 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      */
     private void enterCriticalSection() {
         globalVariable = futureValue;
-        numberOfResponses = 0;
         releaseCriticalSection();
     }
 
