@@ -1,5 +1,6 @@
 package remote;
 
+import enums.TypeMessage;
 import javafx.util.Pair;
 
 import javax.sql.rowset.Predicate;
@@ -24,7 +25,6 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     private long clock;
     private int numberOfResponses;
 
-    //Queue de priorité qui va contenir les requêtes ordonnées par estampille
     private ArrayList<Pair<TypeMessage, Long>> sites;
 
     public GestionnaireRMIImpl(int id, int numberOfSites) throws RemoteException {
@@ -62,8 +62,8 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      * @param time estampille
      */
     public void receiveRequest(int id, long time){
-        clock++;
-        sites.add(new Pair<Integer, Long>(id, clock));
+        clock = Math.max(clock, time) + 1;
+        sites.set(id, new Pair<>(TypeMessage.REQUETE, clock));
     }
 
     /**
@@ -72,12 +72,12 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      * @param id  le site qui relache la section critique
      */
     public void receiveRelease(int id, long time, int value){
-        sites.removeIf( p -> p.getKey() == id);
+        clock = Math.max(clock, time) + 1;
 
-        if(!sites.isEmpty()){
-            if(sites.peek().getKey() == this.id){ //Notre requete est la plus récente
-                enterCriticalSection();
-            }
+        sites.set(id, new Pair<>(TypeMessage.REQUETE, clock));
+
+        if(sites.get(this.id).getKey() == TypeMessage.REQUETE && permission(this.id)){
+            enterCriticalSection();
         }
     }
 
@@ -87,6 +87,8 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      * @param time  estampille
      */
     public void receiveResponse(int id, long time){
+        clock = Math.max(clock, time) + 1;
+
         numberOfResponses++;
         if(numberOfResponses == numberOfSites - 1){
             if(sites.peek().getKey() == id){
@@ -146,7 +148,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     }
 
     /**
-     * Permet d'entrer en section critique. Met à jour la valeur de la variable globale puis sors de la section
+     * Permet d'entrer en section critique. Met à jour la valeur de la variable globale puis sort de la section
      */
     private void enterCriticalSection() {
         globalVariable = futureValue;
