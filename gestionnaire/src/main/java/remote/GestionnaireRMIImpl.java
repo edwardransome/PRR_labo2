@@ -33,6 +33,9 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
         this.numberOfSites = numberOfSites;
         this.clock = 0;
         sites = new ArrayList<Pair<TypeMessage, Long>>(numberOfSites);
+        for(int i = 0; i < numberOfSites; ++i){
+            sites.add(new Pair<>(TypeMessage.LIBERE, 0L));
+        }
     }
 
     /**
@@ -142,7 +145,6 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
                 e.printStackTrace();
             }
         }
-
     }
 
     /**
