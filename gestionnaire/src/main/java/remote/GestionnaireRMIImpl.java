@@ -67,6 +67,21 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     }
 
     /**
+     * methode privé permettant de savoir si l'on peut avoir acces a la section critique
+     * @param id l'id du site qui veut savoir s'il a la permission d'entrée en section critique
+     * @return true si on peut rentrer en section critique
+     */
+    private boolean permission(int id){
+        boolean canAccess = true;
+        for(int i = 0; i< numberOfSites ; i++){
+            canAccess &= sites.get(id).getValue() < sites.get(i).getValue()
+                    || (sites.get(id).getValue() == sites.get(i).getValue()
+                    && id < i);
+        }
+        return canAccess;
+    }
+
+    /**
      * Recoit un message de relachement de Lamport. Retire de la queue la requête du site
      * correspondant et modifie la variable globale
      * @param id  le site qui relache la section critique
