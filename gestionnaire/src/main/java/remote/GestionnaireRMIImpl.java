@@ -20,8 +20,8 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     private int globalVariable;
     private int futureValue;
 
-    private int id;
-    private int numberOfSites;
+    private final int id;
+    private final int numberOfSites;
     private long clock;
     private int numberOfResponses;
 
