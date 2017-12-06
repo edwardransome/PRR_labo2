@@ -7,6 +7,12 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
+/**
+ * Classe implémentant l'interface pour communiquer via RMI
+ *
+ * @author Edward Ransome
+ * @author Michael Spierer
+ */
 public class GestionnaireRMIImpl extends UnicastRemoteObject implements GestionnaireRMI, GestionnaireRMICommunicator {
 
     private int globalVariable;
@@ -45,7 +51,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      * Permet au Travailleur de modifier la variable globale. Pourra être effectué uniquement
      * lorsque la section critique est accordée, c'est-à-dire la requête de ce site est la
      * plus ancienne de la queue.
-     * @param i la variable globale a setter
+     * @param i la variable globale que l'on souhaite setter dans la section critique
      */
     public void set(int i) {
         if(scAccordee){

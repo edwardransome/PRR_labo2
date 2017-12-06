@@ -3,6 +3,13 @@ import remote.GestionnaireRMIImpl;
 import java.rmi.Naming;
 import java.rmi.RMISecurityManager;
 
+/**
+ * Classe main permettant de lancer un gestionnaire
+ * Prend en paramètre : son id et le nombre de site total
+ *
+ * @author Edward Ransome
+ * @author Michael Spierer
+ */
 public class Main {
     public static void main(String[] args) throws Exception {
         //Lecture des arguments et initialisation
