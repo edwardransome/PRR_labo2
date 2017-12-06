@@ -31,6 +31,9 @@ public class Main {
                     }
 
                     case 2:{
+                        System.out.println("Entrez une nouvelle valeur pour la variable globale: ");
+                        int newValue = scanner.nextInt();
+                        gest.set(newValue);
                         break;
                     }
 
