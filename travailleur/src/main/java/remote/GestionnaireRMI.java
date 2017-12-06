@@ -2,7 +2,9 @@ package remote;
 
 public interface GestionnaireRMI extends java.rmi.Remote {
 
-    public int consult();
-    public void set(int i);
+    int consult();
+    void set(int i);
+    void waitForCriticalSection();
+    void releaseCriticalSection();
 
 }

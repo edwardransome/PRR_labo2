@@ -32,9 +32,13 @@ public class Main {
                     }
 
                     case 2:{
+                        System.out.println("Tentative d'obtenir la section critique...");
+                        gest.waitForCriticalSection();
+                        System.out.println("Section critique obtenue!");
                         System.out.println("Entrez une nouvelle valeur pour la variable globale: ");
                         int newValue = scanner.nextInt();
                         gest.set(newValue);
+                        gest.releaseCriticalSection();
                         break;
                     }
 
