@@ -7,6 +7,12 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
+/**
+ * Classe implémentant l'interface pour communiquer via RMI
+ *
+ * @author Edward Ransome
+ * @author Michael Spierer
+ */
 public class GestionnaireRMIImpl extends UnicastRemoteObject implements GestionnaireRMI, GestionnaireRMICommunicator {
 
     private int globalVariable;
