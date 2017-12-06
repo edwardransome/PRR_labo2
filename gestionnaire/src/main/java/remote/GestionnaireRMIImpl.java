@@ -4,6 +4,7 @@ import enums.TypeMessage;
 import javafx.util.Pair;
 
 import javax.sql.rowset.Predicate;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -63,7 +64,13 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      */
     public void receiveRequest(int id, long time){
         clock = Math.max(clock, time) + 1;
+
         sites.set(id, new Pair<>(TypeMessage.REQUETE, clock));
+
+        if(sites.get(this.id).getKey() == TypeMessage.REQUETE && permission(this.id)){
+            enterCriticalSection();
+        }
+
     }
 
     /**
@@ -89,12 +96,13 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     public void receiveResponse(int id, long time){
         clock = Math.max(clock, time) + 1;
 
-        numberOfResponses++;
-        if(numberOfResponses == numberOfSites - 1){
-            if(sites.peek().getKey() == id){
-                //on peut entrer en section critique
-                enterCriticalSection();
-            }
+        Pair<TypeMessage, Long> dernierMessage = sites.get(id);
+        if(dernierMessage.getKey() != TypeMessage.REQUETE){
+            sites.set(id, new Pair<>(TypeMessage.QUITTANCE, time);
+        }
+
+        if(sites.get(this.id).getKey() == TypeMessage.REQUETE && permission(this.id)){
+            enterCriticalSection();
         }
     }
 
