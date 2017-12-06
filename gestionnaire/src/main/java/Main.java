@@ -4,7 +4,7 @@ import java.rmi.Naming;
 import java.rmi.RMISecurityManager;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         //Lecture des arguments et initialisation
         if(args.length != 2){
             throw new IllegalArgumentException("Veuillez lancer le gestionnaire avec deux paramètres: son id et le nombre de sites");
@@ -16,10 +16,11 @@ public class Main {
         try{
             String serverName = "Gestionnaire"+id;
             gest = new GestionnaireRMIImpl(id, numberOfSites);
-            Naming.rebind(serverName, gest);
+            Naming.rebind("//localhost/"+serverName, gest);
             System.out.println("Gestionnaire " + serverName + " est pret!");
         } catch(Exception e){
-            System.out.println("Exception a l'enregistrement: " + e);
+            //System.out.println("Exception a l'enregistrement: " + e);
+            throw e;
         }
     }
 

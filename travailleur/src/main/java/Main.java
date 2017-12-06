@@ -1,4 +1,4 @@
-import interfaces.GestionnaireRMI;
+import remote.GestionnaireRMI;
 
 import java.rmi.Naming;
 import java.rmi.RMISecurityManager;
@@ -15,7 +15,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         try {
-            System.setSecurityManager(new RMISecurityManager());
+            //System.setSecurityManager(new RMISecurityManager());
             GestionnaireRMI gest = (GestionnaireRMI) Naming.lookup("rmi://localhost/Gestionnaire" + id);
             while(!done){
                 System.out.println("Entrez 1 pour afficher la variable globale");
