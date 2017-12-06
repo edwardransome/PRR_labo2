@@ -67,14 +67,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
         clock = Math.max(clock, time) + 1;
 
         sites.set(id, new Pair<>(TypeMessage.REQUETE, clock));
-        try {
-            GestionnaireRMICommunicator gest =
-                    (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + id);
-            gest.receiveResponse(id, clock);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
+        sendResponse(id);
 
         if(sites.get(this.id).getKey() == TypeMessage.REQUETE && permission(this.id)){
             enterCriticalSection();
@@ -105,6 +98,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     public void receiveRelease(int id, long time, int value){
         clock = Math.max(clock, time) + 1;
 
+        globalVariable = value;
         sites.set(id, new Pair<>(TypeMessage.REQUETE, clock));
 
         if(sites.get(this.id).getKey() == TypeMessage.REQUETE && permission(this.id)){
@@ -135,14 +129,17 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      * Envoit une requete a tous les autres sites et ajoute sa propre requete a la queue
      */
     private void requestCriticalSection(){
+
         clock++;
         for(int i = 0; i < numberOfSites; ++i){
-            try {
-                GestionnaireRMICommunicator gest =
-                        (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + i);
-                gest.receiveRequest(id, clock);
-            } catch (Exception e){
-                e.printStackTrace();
+            if(i != this.id){
+                try {
+                    GestionnaireRMICommunicator gest =
+                            (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + i);
+                    gest.receiveRequest(id, clock);
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -155,7 +152,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
         try {
             GestionnaireRMICommunicator gest =
                     (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + id);
-            gest.receiveResponse(id, clock);
+            gest.receiveResponse(this.id, clock);
         } catch (Exception e){
             e.printStackTrace();
         }
