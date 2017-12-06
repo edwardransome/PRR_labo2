@@ -2,19 +2,10 @@ package remote;
 
 import enums.TypeMessage;
 import javafx.util.Pair;
-
-import javax.sql.rowset.Predicate;
-import java.lang.reflect.Type;
-import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
 
 public class GestionnaireRMIImpl extends UnicastRemoteObject implements GestionnaireRMI, GestionnaireRMICommunicator {
 
@@ -33,7 +24,11 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
         this.numberOfSites = numberOfSites;
         this.clock = 0;
         sites = new ArrayList<>(numberOfSites);
+        for(int i = 0; i < numberOfSites; ++i){
+            sites.add(new Pair<>(TypeMessage.LIBERE, 0L));
+        }
     }
+
 
     /**
      * Permet de consulter la variable globale. Ne nécessite pas la possession de la section
@@ -48,7 +43,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      * Permet au Travailleur de modifier la variable globale. Pourra être effectué uniquement
      * lorsque la section critique est accordée, c'est-à-dire la requête de ce site est la
      * plus ancienne de la queue.
-     * @param i
+     * @param i la variable globale a setter
      */
     public void set(int i) {
         futureValue = i;
@@ -57,17 +52,17 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
 
     /**
      * Recoit une requete de section critique d'un site et l'ajoute a la queue
-     * @param id  id du site effectuant la requete
+     * @param site l'id du site effectuant la requete
      * @param time estampille
      */
-    public void receiveRequest(int id, long time){
+    public void receiveRequest(int site, long time){
         clock = Math.max(clock, time) + 1;
 
-        sites.set(id, new Pair<>(TypeMessage.REQUETE, clock));
+        sites.set(site, new Pair<>(TypeMessage.REQUETE, clock));
         try {
             GestionnaireRMICommunicator gest =
-                    (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + id);
-            gest.receiveResponse(id, clock);
+                    (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + site);
+            gest.receiveResponse(site, clock);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -81,15 +76,15 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
 
     /**
      * methode privé permettant de savoir si l'on peut avoir acces a la section critique
-     * @param id l'id du site qui veut savoir s'il a la permission d'entrée en section critique
+     * @param site l'id du site qui veut savoir s'il a la permission d'entrée en section critique
      * @return true si on peut rentrer en section critique
      */
-    private boolean permission(int id){
+    private boolean permission(int site){
         boolean canAccess = true;
         for(int i = 0; i< numberOfSites ; i++){
-            canAccess &= sites.get(id).getValue() < sites.get(i).getValue()
-                    || (sites.get(id).getValue() == sites.get(i).getValue()
-                    && id < i);
+            canAccess &= sites.get(site).getValue() < sites.get(i).getValue()
+                    || (sites.get(site).getValue() == sites.get(i).getValue()
+                    && site < i);
         }
         return canAccess;
     }
@@ -97,12 +92,12 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     /**
      * Recoit un message de relachement de Lamport. Retire de la queue la requête du site
      * correspondant et modifie la variable globale
-     * @param id  le site qui relache la section critique
+     * @param site l'id du site qui relache la section critique
      */
-    public void receiveRelease(int id, long time, int value){
+    public void receiveRelease(int site, long time, int value){
         clock = Math.max(clock, time) + 1;
 
-        sites.set(id, new Pair<>(TypeMessage.REQUETE, clock));
+        sites.set(site, new Pair<>(TypeMessage.REQUETE, clock));
 
         if(sites.get(this.id).getKey() == TypeMessage.REQUETE && permission(this.id)){
             enterCriticalSection();
@@ -111,15 +106,15 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
 
     /**
      * Reçoit la réponse (quittance) d'un autre site.
-     * @param id  le site qui envoit la réponse
+     * @param site l'id du site qui envoit la réponse
      * @param time  estampille
      */
-    public void receiveResponse(int id, long time){
+    public void receiveResponse(int site, long time){
         clock = Math.max(clock, time) + 1;
 
-        Pair<TypeMessage, Long> dernierMessage = sites.get(id);
+        Pair<TypeMessage, Long> dernierMessage = sites.get(site);
         if(dernierMessage.getKey() != TypeMessage.REQUETE){
-            sites.set(id, new Pair<>(TypeMessage.QUITTANCE, time));
+            sites.set(site, new Pair<>(TypeMessage.QUITTANCE, time));
         }
 
         if(sites.get(this.id).getKey() == TypeMessage.REQUETE && permission(this.id)){
@@ -142,18 +137,17 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
                 e.printStackTrace();
             }
         }
-
     }
 
     /**
      * Envoit une quittance a un site confirmant la reception de la requete
-     * @param id
+     * @param site le site a qui envoyer la quittance
      */
-    private void sendResponse(int id){
+    private void sendResponse(int site){
         try {
             GestionnaireRMICommunicator gest =
-                    (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + id);
-            gest.receiveResponse(id, clock);
+                    (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + site);
+            gest.receiveResponse(site, clock);
         } catch (Exception e){
             e.printStackTrace();
         }

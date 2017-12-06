@@ -7,10 +7,10 @@ import java.rmi.RemoteException;
 
 public interface GestionnaireRMICommunicator extends java.rmi.Remote {
 
-    public void receiveRequest(int id, long time) throws RemoteException;
+    void receiveRequest(int id, long time) throws RemoteException;
 
-    public void receiveRelease(int id, long time, int value) throws RemoteException;
+    void receiveRelease(int id, long time, int value) throws RemoteException;
 
-    public void receiveResponse(int id, long time) throws RemoteException;
+    void receiveResponse(int id, long time) throws RemoteException;
 
 }
