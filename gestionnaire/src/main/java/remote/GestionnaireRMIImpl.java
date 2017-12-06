@@ -75,9 +75,11 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     private boolean permission(int site){
         boolean canAccess = true;
         for(int i = 0; i< numberOfSites ; i++){
-            canAccess &= sites.get(site).getValue() < sites.get(i).getValue()
-                    || (sites.get(site).getValue() == sites.get(i).getValue()
-                    && site < i);
+            if(i != id){
+                canAccess &= sites.get(site).getValue() < sites.get(i).getValue()
+                        || (sites.get(site).getValue() == sites.get(i).getValue()
+                        && site < i);
+            }
         }
         return canAccess;
     }
@@ -91,7 +93,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
         clock = Math.max(clock, time) + 1;
 
         globalVariable = value;
-        sites.set(id, new Pair<>(TypeMessage.REQUETE, clock));
+        sites.set(id, new Pair<>(TypeMessage.LIBERE, clock));
 
         if(sites.get(this.id).getKey() == TypeMessage.REQUETE && permission(this.id)){
             enterCriticalSection();
@@ -123,12 +125,25 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     private void requestCriticalSection(){
 
         clock++;
+        sites.set(this.id,new Pair<>(TypeMessage.REQUETE,clock));
         for(int i = 0; i < numberOfSites; ++i){
             if(i != this.id){
                 try {
-                    GestionnaireRMICommunicator gest =
-                            (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + i);
-                    gest.receiveRequest(id, clock);
+                    final int currentSite = i;
+                    Thread T = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                GestionnaireRMICommunicator gest =
+                                        (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + currentSite);
+                                gest.receiveRequest(id, clock);
+                            } catch (Exception e){
+                                e.printStackTrace();
+                            }
+
+                        }
+                    });
+                    T.start();
                 } catch (Exception e){
                     e.printStackTrace();
                 }
@@ -174,6 +189,4 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
         globalVariable = futureValue;
         releaseCriticalSection();
     }
-
-
 }
