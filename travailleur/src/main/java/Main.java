@@ -8,7 +8,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         if(args.length != 1){
-            throw new IllegalArgumentException("Veuillez lancer le gestionnaire avec un paramètre: son id");
+            throw new IllegalArgumentException("Veuillez lancer le travailleur" +
+                    " avec un paramètre: son id");
         }
         int id = Integer.parseInt(args[0]);
         boolean done = false;

@@ -24,6 +24,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     private int numberOfResponses;
 
     //Queue de priorité qui va contenir les requêtes ordonnées par estampille
+    //Utiliser une queue de priorité nous assure de récuperer facilement la requete du site l'estampille la plus ancienne
     private PriorityQueue<Pair<Integer, Long>> sites;
 
     public GestionnaireRMIImpl(int id, int numberOfSites) throws RemoteException {
@@ -149,7 +150,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     }
 
     /**
-     * Permet d'entrer en section critique. Met à jour la valeur de la variable globale puis sors de la section
+     * Permet d'entrer en section critique. Met à jour la valeur de la variable globale puis sort de la section
      */
     private void enterCriticalSection() {
         globalVariable = futureValue;
