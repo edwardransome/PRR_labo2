@@ -32,7 +32,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
         this.id = id;
         this.numberOfSites = numberOfSites;
         this.clock = 0;
-        sites = new ArrayList<Pair<TypeMessage, Long>>(numberOfSites);
+        sites = new ArrayList<>(numberOfSites);
     }
 
     /**
