@@ -9,6 +9,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -24,7 +25,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
     private int numberOfResponses;
 
     //Queue de priorité qui va contenir les requêtes ordonnées par estampille
-    private PriorityQueue<Pair<Integer, Long>> sites;
+    private ArrayList<Pair<TypeMessage, Long>> sites;
 
     public GestionnaireRMIImpl(int id, int numberOfSites) throws RemoteException {
         super();
@@ -32,12 +33,7 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
         this.numberOfSites = numberOfSites;
         this.clock = 0;
         this.numberOfResponses = 0;
-        sites = new PriorityQueue<Pair<Integer, Long>>(numberOfSites, new Comparator<Pair<Integer, Long>>() {
-            public int compare(Pair<Integer, Long> o1, Pair<Integer, Long> o2) {
-                int comp = Long.valueOf(o1.getValue()).compareTo(Long.valueOf(o2.getValue()));
-                return comp == 0 ? Integer.valueOf(o1.getKey()).compareTo(Integer.valueOf(o2.getKey())) : comp;
-            }
-        });
+        sites = new ArrayList<Pair<TypeMessage, Long>>(numberOfSites);
     }
 
     /**
@@ -66,7 +62,8 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
      * @param time estampille
      */
     public void receiveRequest(int id, long time){
-        sites.add(new Pair<Integer, Long>(id, time));
+        clock++;
+        sites.add(new Pair<Integer, Long>(id, clock));
     }
 
     /**
