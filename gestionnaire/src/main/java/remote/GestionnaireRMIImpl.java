@@ -129,13 +129,13 @@ public class GestionnaireRMIImpl extends UnicastRemoteObject implements Gestionn
         for(int i = 0; i < numberOfSites; ++i){
             if(i != this.id){
                 try {
-                    final int j = i;
+                    final int currentSite = i;
                     Thread T = new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 GestionnaireRMICommunicator gest =
-                                        (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + j);
+                                        (GestionnaireRMICommunicator) Naming.lookup("rmi://localhost/Gestionnaire" + currentSite);
                                 gest.receiveRequest(id, clock);
                             } catch (Exception e){
                                 e.printStackTrace();
