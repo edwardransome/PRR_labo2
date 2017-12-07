@@ -14,7 +14,7 @@
  * nombre total de sites.
  * Les travailleurs prennent un seul paramètre: l'identifiant de leur site.
  *
- * Nous faisons l'hypothèse que tous les gestionnaires ont été lancés avec de
+ * Nous faisons l'hypothèse que tous les gestionnaires ont été lancés avant de
  * lancer les travailleurs. L'adresse
  * utilisée pour la communication RMI est rmi://localhost/{Nom du gestionnaire}.
  *

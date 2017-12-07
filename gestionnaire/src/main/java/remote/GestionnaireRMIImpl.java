@@ -18,7 +18,6 @@ import java.util.ArrayList;
 public class GestionnaireRMIImpl extends UnicastRemoteObject implements GestionnaireRMI, GestionnaireRMICommunicator {
 
     private int globalVariable;
-    private int futureValue;
 
     private final int id;
     private final int numberOfSites;

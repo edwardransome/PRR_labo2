@@ -24,9 +24,9 @@ public class Main {
         try {
             GestionnaireRMI gest = (GestionnaireRMI) Naming.lookup("rmi://localhost/Gestionnaire" + id);
             while(!done){
-                System.out.println("Entrez "+ Action.CONSULT.getIndex() +" pour afficher la variable globale");
-                System.out.println("Entrez "+ Action.SET.getIndex() +" pour modifier la variable globale");
-                System.out.println("Entrez "+ Action.QUIT.getIndex() +" pour quitter");
+                System.out.println("Entrez "+ Action.CONSULT.getAdjustedIndex() +" pour afficher la variable globale");
+                System.out.println("Entrez "+ Action.SET.getAdjustedIndex() +" pour modifier la variable globale");
+                System.out.println("Entrez "+ Action.QUIT.getAdjustedIndex() +" pour quitter");
                 int input = scanner.nextInt();
                 try {
                     Action a = Action.values()[input-1];

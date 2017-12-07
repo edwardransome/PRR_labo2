@@ -6,11 +6,10 @@ package enums;
  * @author Edward Ransome
  * @author Michael Spierer
  */
-
 public enum Action {
     CONSULT, SET, QUIT;
 
-    public int getIndex(){
+    public int getAdjustedIndex(){
         return ordinal()+1;
     }
 }
