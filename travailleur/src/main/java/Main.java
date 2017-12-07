@@ -4,7 +4,13 @@ import remote.GestionnaireRMI;
 import java.rmi.Naming;
 import java.util.Scanner;
 
-
+/**
+ * Classe main permettant de lancer un travailleur
+ * Prend en paramètre : son id
+ *
+ * @author Edward Ransome
+ * @author Michael Spierer
+ */
 public class Main {
     public static void main(String[] args) {
         if(args.length != 1){
@@ -26,22 +32,24 @@ public class Main {
                     Action a = Action.values()[input-1];
 
                     switch (a) {
-                        case CONSULT:
+                        case CONSULT: //On désire consulter la valeur de la variable
                             int value = gest.consult();
                             System.out.println("La valeur actuelle de la variable globale est de " + value);
                             break;
 
-                        case SET:
+                        case SET: //On désire obtenir la section critique, modifier la variable, puis relacher la SC
                             System.out.println("Tentative d'obtenir la section critique...");
                             gest.waitForCriticalSection();
                             System.out.println("Section critique obtenue!");
+                            int currentValue = gest.consult();
+                            System.out.println("La valeur actuelle de la variable globale est de " + currentValue);
                             System.out.println("Entrez une nouvelle valeur pour la variable globale: ");
                             int newValue = scanner.nextInt();
                             gest.set(newValue);
                             gest.releaseCriticalSection();
                             break;
 
-                        case QUIT:
+                        case QUIT: //Quitter le travailleur
                             done = true;
                             break;
 
@@ -53,7 +61,7 @@ public class Main {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Erreur RMI detectee: " + e);
         }
 
         System.out.println("Au revoir!");

@@ -1,9 +1,13 @@
-/**
- * Interface permettant aux différents gestionnaires de communiquer entre eux avec des requêtes
- */
 package remote;
 
 import java.rmi.RemoteException;
+
+/**
+ * Interface permettant aux différents gestionnaires de communiquer (avec RMI) entre eux avec des requêtes
+ *
+ * @author Edward Ransome
+ * @author Michael Spierer
+ */
 
 public interface GestionnaireRMICommunicator extends java.rmi.Remote {
 

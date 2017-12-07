@@ -1,6 +1,5 @@
 package enums;
 
-
 /**
  * Enum déclarant les différents types d'actions que l'on peut faire dans le Main
  *

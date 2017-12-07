@@ -3,7 +3,7 @@ package remote;
 import java.rmi.RemoteException;
 
 /**
- * Interface implémenté par le gestionnaire afin de communiquer avec RMI pour les appels depuis un travailleur
+ * Interface implémentée par le gestionnaire afin qu'un travailleur puisse utiliser RMI sur ses méthodes
  *
  * @author Edward Ransome
  * @author Michael Spierer
@@ -11,8 +11,11 @@ import java.rmi.RemoteException;
 public interface GestionnaireRMI extends java.rmi.Remote {
 
     int consult() throws RemoteException;
+
     void set(int i) throws RemoteException;
+
     void waitForCriticalSection() throws RemoteException;
+
     void releaseCriticalSection() throws RemoteException;
 
 }

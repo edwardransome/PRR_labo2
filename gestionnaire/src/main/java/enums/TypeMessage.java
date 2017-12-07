@@ -7,5 +7,5 @@ package enums;
  * @author Michael Spierer
  */
 public enum TypeMessage {
-    REQUETE,LIBERE,QUITTANCE
+    REQUETE, LIBERE, QUITTANCE
 }
