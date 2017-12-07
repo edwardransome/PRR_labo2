@@ -17,13 +17,18 @@ import java.util.ArrayList;
  */
 public class GestionnaireRMIImpl extends UnicastRemoteObject implements GestionnaireRMI, GestionnaireRMICommunicator {
 
+    // Variable globale
     private int globalVariable;
-
+    // Id du site
     private final int id;
+    // Nombre de site total
     private final int numberOfSites;
+    // Horloge logique local
     private long clock;
+    // Vaut true si la section critique est accordé à ce site
     private Boolean scAccordee;
-
+    // Une Arraylist de Pair pour l'implémentation de l'algorithme de Lamport où chaque index correspond à un site
+    // et chaque Pair correspond à un type de messages associé à une estampille.
     private ArrayList<Pair<TypeMessage, Long>> sites;
 
     public GestionnaireRMIImpl(int id, int numberOfSites) throws RemoteException {
